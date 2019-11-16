@@ -12,3 +12,5 @@ pom.xml.asc
 /profiles.clj
 /dev/resources/local.edn
 /dev/src/local.clj
+/.idea/
+apache-httpclient-timeouts.iml
