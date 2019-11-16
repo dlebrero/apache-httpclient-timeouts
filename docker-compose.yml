@@ -1,0 +1,22 @@
+version: "3"
+services:
+
+  client:
+    build:
+     context: .
+     dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+      - ~/.lein:/root/.lein
+    ports:
+      - "47480:47480"
+      - "3000:3000"
+    environment:
+      FOO: bar
+  toxiproxy:
+    image: shopify/toxiproxy:2.1.4
+    expose:
+      - "22220"
+  nginx:
+    image: nginx:1.17.5-alpine
