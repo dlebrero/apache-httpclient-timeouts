@@ -14,9 +14,9 @@ services:
       - "3000:3000"
     environment:
       FOO: bar
-  toxiproxy:
+  local.toxiproxy:
     image: shopify/toxiproxy:2.1.4
     expose:
       - "22220"
-  nginx:
+  local.nginx:
     image: nginx:1.17.5-alpine
