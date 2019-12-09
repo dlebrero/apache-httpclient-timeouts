@@ -7,15 +7,6 @@
 ;; nginx is working
 (client/get "http://local.nginx/")
 
-(time
-  (do
-    (->
-      (client/get "http://local.nginx/")
-      :headers)
-
-    ;(client/get "http://192.168.0.1/")
-    ))
-
 ;; setup ToxiProxy route to nginx
 (client/post "http://local.toxiproxy:8474/populate"
   {:form-params [{:enabled true
