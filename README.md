@@ -1,70 +1,17 @@
-# apache-httpclient-timeouts
+# Apache Http Client and Asynchronous HTTP client timeouts explained
 
-FIXME: description
+This code is the companion of the blog post [Apache Http Client and Asynchronous HTTP client timeouts explained in pictures](http://danlebrero.com/2019/12/11/apache-http-client-timeouts-config-production-asynchronous-http-client-pictures/)
 
-## Developing
+This project uses Docker to create an environment with an HTTP client which queries an HTTP server, with a ToxiProxy in the middle to mess around with the behaviour of the HTTP server. 
 
-### Setup
+## Usage
 
-When you first clone this repository, run:
+Docker should be installed.
 
-```sh
-lein duct setup
-```
+To run:
 
-This will create files for local configuration, and prep your system
-for the project.
+     docker-compose up -d && docker-compose logs
+     
+Then connect to the REPL in port 47480.
 
-### Environment
-
-To begin developing, start with a REPL.
-
-```sh
-lein repl
-```
-
-Then load the development environment.
-
-```clojure
-user=> (dev)
-:loaded
-```
-
-Run `go` to prep and initiate the system.
-
-```clojure
-dev=> (go)
-:duct.server.http.jetty/starting-server {:port 3000}
-:initiated
-```
-
-By default this creates a web server at <http://localhost:3000>.
-
-When you make changes to your source files, use `reset` to reload any
-modified files and reset the server.
-
-```clojure
-dev=> (reset)
-:reloading (...)
-:resumed
-```
-
-### Testing
-
-Testing is fastest through the REPL, as you avoid environment startup
-time.
-
-```clojure
-dev=> (test)
-...
-```
-
-But you can also run tests through Leiningen.
-
-```sh
-lein test
-```
-
-## Legal
-
-Copyright © 2019 FIXME
+To test the [Apache HTTP client](http://hc.apache.org), see [here](/src/apache_httpclient_timeouts/http_client.clj). The [Asynchronous HTTP Client](https://github.com/AsyncHttpClient/async-http-client) example is [here](/src/apache_httpclient_timeouts/async_http_client.clj)
