@@ -2,21 +2,7 @@
   (:require
     [clj-http.client :as client]
     [clojure.tools.logging :as log]
-    [clj-http.conn-mgr :as http.conn-mgr]))
-
-(defn- default-connection-manager-opts
-  ":timeout - Time that connections are left open before automatically closing ... in seconds"
-  [opts]
-  (merge {:timeout 10 :threads 2 :insecure? false :default-per-route 2}
-    (select-keys opts [:timeout :threads :insecure? :default-per-route])))
-
-(defn new-connection-manager
-  ([] (new-connection-manager {}))
-  ([opts]
-   (http.conn-mgr/make-reusable-conn-manager (default-connection-manager-opts opts))))
-
-(defn shutdown-manager [connection-manager]
-  (http.conn-mgr/shutdown-manager connection-manager))
+    [clj-http.conn-mgr :as conn-manager]))
 
 (defn req-opts
   "All these timeouts are in milliseconds
@@ -50,6 +36,7 @@
 
 (comment
   ;; Connection timeout
+
   ;; First no specific connection timeout:
   (time
     (try
@@ -111,8 +98,61 @@
 
 
 (comment
-  (def cp (new-connection-manager {:timeout 100 :threads 2 :default-per-route 2}))
+  ;; Connection pool Time To Live
+  ;; Create a new connection pool
+  (def cp (conn-manager/make-reusable-conn-manager
+            {:timeout 1 ; in seconds. This is called TimeToLive in PoolingHttpClientConnectionManager
+             }))
 
-  (shutdown-manager cp)
-  (time
-    (-> (client/get "http://local.nginx/" {:connection-manager cp}) :headers)))
+  (dotimes [_ 10]
+    (log/info "Send Http request")
+    (-> (client/get "http://local.nginx/" {:connection-manager cp}) :headers)
+    (Thread/sleep 500))
+
+  ;; A connection pool with 20 seconds TTL
+  (def cp-2 (conn-manager/make-reusable-conn-manager
+            {:timeout 20 ; in seconds.
+             }))
+
+  (dotimes [_ 10]
+    (log/info "Send Http request")
+    (-> (client/get "http://local.nginx/" {:connection-manager cp-2}) :headers)
+    (Thread/sleep 500))
+
+  )
+
+
+(comment
+  ;; Connection pool timeout
+
+  (client/delete "http://local.toxiproxy:8474/proxies/proxied.nginx/toxics/first")
+
+  ;; Read requests will take 20 seconds
+  (client/post "http://local.toxiproxy:8474/proxies/proxied.nginx/toxics"
+    {:form-params {:attributes {:latency 20000
+                                :jitter 0}
+                   :toxicity 1.0
+                   :stream "upstream"
+                   :type "latency"
+                   :name "first"}
+     :content-type :json})
+
+  ;; Created a connection pool with 3 max connections
+  (def cp-3 (conn-manager/make-reusable-conn-manager
+              {:timeout 100
+               :threads 3           ;; Max connections in the pool.
+               :default-per-route 3 ;; Max connections per route (~ max connection to a server)
+               }))
+
+  ;; Send 4 Http requests
+  (dotimes [_ 4]
+    (future
+      (time
+        (try
+          (client/get "http://local.toxiproxy:22220/"
+            {:connection-manager cp-3
+             :connection-request-timeout 1000})
+          (catch Exception e
+            (log/info (.getClass e) ":" (.getMessage e)))))))
+
+  )
