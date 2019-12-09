@@ -181,8 +181,8 @@
     :request-timeout 1000
     :max-conns-per-host 3
     :max-conns-total 3
-    :connection-timeout 3000
-    :read-timeout 3000
+    :connection-timeout 300000000
+    :read-timeout 300000000
     ))
 
 (comment
