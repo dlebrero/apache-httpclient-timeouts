@@ -5,7 +5,7 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [clj-http "3.10.0"]
                  [cheshire "5.8.1"]
-                 [http.async.client "1.3.1"]
+                 [org.asynchttpclient/async-http-client "2.10.4"]
                  [duct/core "0.7.0"]
                  [duct/module.logging "0.4.0"]
                  [duct/module.web "0.7.0" :exclusions [org.slf4j/slf4j-nop]]
