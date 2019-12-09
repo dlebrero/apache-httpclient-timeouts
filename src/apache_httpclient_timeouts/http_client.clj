@@ -4,14 +4,6 @@
     [clojure.tools.logging :as log]
     [clj-http.conn-mgr :as conn-manager]))
 
-(defn req-opts
-  "All these timeouts are in milliseconds
-  :connection-timeout - time to establish the socket
-  :connection-request-timeout - time to have a free socket
-  :socket-timeout - time to get the response"
-  [socket-timeout]
-  {:connection-timeout 2000 :connection-request-timeout 50 :socket-timeout socket-timeout})
-
 ;; nginx is working
 (client/get "http://local.nginx/")
 
